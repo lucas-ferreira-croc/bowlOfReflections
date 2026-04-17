@@ -2,6 +2,7 @@
 #define FIRST_APP_HPP
 
 #include "window/bor_window.hpp"
+#include "vk/bor_pipeline.hpp"
 
 namespace bor
 {
@@ -15,6 +16,7 @@ namespace bor
 
     private:
         BoRWindow borWindow{WIDTH, HEIGHT, "Bowl of Reflections"};
+        BoRPipeline borPipeline{"C:\\dev\\bowlOfReflections\\shaders\\simple_shader.vert.spv", "C:\\dev\\bowlOfReflections\\shaders\\simple_shader.frag.spv"};
     };
 }
 

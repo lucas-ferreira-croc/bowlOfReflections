@@ -33,9 +33,16 @@ set(APPS_SOURCE
     src/apps/first_app.cpp
 )
 
+set(VK_SOURCE
+    src/vk/bor_pipeline.hpp
+    src/vk/bor_pipeline.cpp
+)
+
+
 add_executable(bowl_of_reflections
     ${MAIN_SOURCE}
     ${APPS_SOURCE}
+    ${VK_SOURCE}
     ${WINDOW_SOURCE}
 )
 
