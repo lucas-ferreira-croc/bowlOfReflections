@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(bowl_of_reflections LANGUAGES CXX)
+
+foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
+
+    # Caminho para binario final (bowl_of_reflections.exe)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_SOURCE_DIR}/bin/${OUTPUTCONFIG}/$<PLATFORM_ID>)
+
+    # Caminho para arquivos intermediarios (obj, etc)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_SOURCE_DIR}/bin-int/${OUTPUTCONFIG}/$<PLATFORM_ID>)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_SOURCE_DIR}/bin-int/${OUTPUTCONFIG}/$<PLATFORM_ID>)
+    set(CMAKE_PDB_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER}     ${CMAKE_SOURCE_DIR}/bin-int/${OUTPUTCONFIG}/$<PLATFORM_ID>)
+endforeach()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT herd)
+
+set(MAIN_SOURCE
+    src/main.cpp
+)
+
+set(WINDOW_SOURCE
+    src/window/bor_window.hpp
+    src/window/bor_window.cpp
+)
+
+set(APPS_SOURCE
+    src/apps/first_app.hpp
+    src/apps/first_app.cpp
+)
+
+add_executable(bowl_of_reflections
+    ${MAIN_SOURCE}
+    ${APPS_SOURCE}
+    ${WINDOW_SOURCE}
+)
+
+target_include_directories(bowl_of_reflections PRIVATE
+    src
+    C:/VulkanSDK/1.4.341.1/Include
+    deps/glfw/include
+    deps/glm
+)
+
+target_link_libraries(bowl_of_reflections PRIVATE
+    C:/VulkanSDK/1.4.341.1/Lib/vulkan-1.lib
+     ${CMAKE_SOURCE_DIR}/deps/glfw/lib-vc2019/glfw3.lib
+)
