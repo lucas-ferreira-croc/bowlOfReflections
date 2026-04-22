@@ -16,8 +16,9 @@ endforeach()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT herd)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT bowl_of_reflections)
 
 set(MAIN_SOURCE
     src/main.cpp
@@ -36,6 +37,8 @@ set(APPS_SOURCE
 set(VK_SOURCE
     src/vk/bor_pipeline.hpp
     src/vk/bor_pipeline.cpp
+    src/vk/bor_device.hpp
+    src/vk/bor_device.cpp
 )
 
 
@@ -56,4 +59,8 @@ target_include_directories(bowl_of_reflections PRIVATE
 target_link_libraries(bowl_of_reflections PRIVATE
     C:/VulkanSDK/1.4.341.1/Lib/vulkan-1.lib
      ${CMAKE_SOURCE_DIR}/deps/glfw/lib-vc2019/glfw3.lib
+)
+
+target_compile_definitions(bowl_of_reflections PRIVATE
+    VK_USE_PLATFORM_WIN32_KHR
 )

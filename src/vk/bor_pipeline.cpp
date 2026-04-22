@@ -5,9 +5,10 @@
 #include <iostream>
 namespace bor
 {
-    BoRPipeline::BoRPipeline(const std::string& vertFilepath, const std::string& fragFilepath)
+    BoRPipeline::BoRPipeline(BoRDevice& device,  const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& configInfo)
+        : borDevice(device)
     {
-        createGraphicsPipeline(vertFilepath, fragFilepath);
+        createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
     }
 
 
@@ -30,13 +31,33 @@ namespace bor
         return buffer;
     }
 
-    void BoRPipeline::createGraphicsPipeline(const std::string& vertFilepath, const std::string& fragFilepath)
+    void BoRPipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
+    {
+        VkShaderModuleCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        createInfo.codeSize = code.size();
+        createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+        if(vkCreateShaderModule(borDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS)
+        {
+            throw new std::runtime_error("failed to create shader module");
+        }
+    }
+
+    void BoRPipeline::createGraphicsPipeline(const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& configInfo)
     {
         auto vertCode = readFile(vertFilepath);
         auto fragCode = readFile(fragFilepath);
 
         std::cout << "Vertex Shader Code size: " << vertCode.size() << '\n';
         std::cout << "Fragment Shader Code size: " << fragCode.size() << '\n';
+    }
+
+
+    PipelineConfigInfo BoRPipeline::defaultPipelineConfigInfo(uint32_t widht, uint32_t height)
+    {
+        PipelineConfigInfo configInfo{};
+        return configInfo;
     }
 
 }

@@ -3,6 +3,7 @@
 
 #include "window/bor_window.hpp"
 #include "vk/bor_pipeline.hpp"
+#include "vk/bor_device.hpp"
 
 namespace bor
 {
@@ -16,7 +17,8 @@ namespace bor
 
     private:
         BoRWindow borWindow{WIDTH, HEIGHT, "Bowl of Reflections"};
-        BoRPipeline borPipeline{"C:\\dev\\bowlOfReflections\\shaders\\simple_shader.vert.spv", "C:\\dev\\bowlOfReflections\\shaders\\simple_shader.frag.spv"};
+        BoRDevice borDevice{borWindow};
+        BoRPipeline borPipeline{borDevice, "C:\\dev\\bowlOfReflections\\shaders\\simple_shader.vert.spv", "C:\\dev\\bowlOfReflections\\shaders\\simple_shader.frag.spv", BoRPipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
     };
 }
 
