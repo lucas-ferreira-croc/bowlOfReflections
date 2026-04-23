@@ -4,6 +4,10 @@
 #include "window/bor_window.hpp"
 #include "vk/bor_pipeline.hpp"
 #include "vk/bor_device.hpp"
+#include "vk/bor_swap_chain.hpp"
+
+#include <memory>
+#include <vector>
 
 namespace bor
 {
@@ -13,12 +17,26 @@ namespace bor
         static constexpr int WIDTH = 2048;
         static constexpr int HEIGHT = 1536;
 
+        FirstApp();
+        ~FirstApp();
+
+        FirstApp(const FirstApp&) = delete;
+        FirstApp &operator=(const FirstApp&) = delete;
+
         void run();
 
     private:
+        void createPipelineLayout();
+        void createPipeline();
+        void createCommandBuffers();
+        void drawFrame();
+
         BoRWindow borWindow{WIDTH, HEIGHT, "Bowl of Reflections"};
         BoRDevice borDevice{borWindow};
-        BoRPipeline borPipeline{borDevice, "C:\\dev\\bowlOfReflections\\shaders\\simple_shader.vert.spv", "C:\\dev\\bowlOfReflections\\shaders\\simple_shader.frag.spv", BoRPipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
+        BoRSwapChain borSwapChain{borDevice, borWindow.getExtent()};
+        std::unique_ptr<BoRPipeline> borPipeline;
+        VkPipelineLayout pipelineLayout;
+        std::vector<VkCommandBuffer> commandBuffers;
     };
 }
 

@@ -39,6 +39,8 @@ set(VK_SOURCE
     src/vk/bor_pipeline.cpp
     src/vk/bor_device.hpp
     src/vk/bor_device.cpp
+    src/vk/bor_swap_chain.hpp
+    src/vk/bor_swap_chain.cpp
 )
 
 
@@ -63,4 +65,5 @@ target_link_libraries(bowl_of_reflections PRIVATE
 
 target_compile_definitions(bowl_of_reflections PRIVATE
     VK_USE_PLATFORM_WIN32_KHR
+    NOMINMAX
 )

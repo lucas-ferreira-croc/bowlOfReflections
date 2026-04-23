@@ -9,18 +9,33 @@
 namespace bor
 {
 
-    struct PipelineConfigInfo{};
+    struct PipelineConfigInfo
+    {
+        VkViewport viewport;
+        VkRect2D scissor;
+        VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+        VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+        VkPipelineMultisampleStateCreateInfo multisampleInfo;
+        VkPipelineColorBlendAttachmentState colorBlendAttachment;
+        VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+        VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+        VkPipelineLayout pipelineLayout = nullptr;
+        VkRenderPass renderPass = nullptr;
+        uint32_t subpass = 0;
+    };
 
     class BoRPipeline
     {
     public:
         BoRPipeline(BoRDevice& device,  const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& configInfo);
-        ~BoRPipeline() {}
+        ~BoRPipeline();
 
         BoRPipeline(const BoRPipeline&) = delete;
         BoRPipeline &operator=(const BoRPipeline&) = delete;
 
-        static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t widht, uint32_t height);
+        void bind(VkCommandBuffer commandBuffer);
+
+        static PipelineConfigInfo defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t widht, uint32_t height);
 
     private:
         static std::vector<char> readFile(const std::string& filepath);
