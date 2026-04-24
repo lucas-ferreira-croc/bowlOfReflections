@@ -5,7 +5,8 @@
 #include "vk/bor_pipeline.hpp"
 #include "vk/bor_device.hpp"
 #include "vk/bor_swap_chain.hpp"
-#include "vk/bor_model.hpp"
+
+#include "game/bor_game_object.hpp"
 
 #include <memory>
 #include <vector>
@@ -27,7 +28,7 @@ namespace bor
         void run();
 
     private:
-        void loadModels();
+        void loadGameObjects();
 
         void createPipelineLayout();
         void createPipeline();
@@ -36,6 +37,7 @@ namespace bor
         void drawFrame();
         void recreateSwapChain();
         void recordCommandBuffer(int imageIndex);
+        void renderGameObjects(VkCommandBuffer commandBuffer);
 
         BoRWindow borWindow{WIDTH, HEIGHT, "Bowl of Reflections"};
         BoRDevice borDevice{borWindow};
@@ -44,7 +46,7 @@ namespace bor
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
 
-        std::unique_ptr<BoRModel> borModel;
+        std::vector<BoRGameObject> gameObjects;
     };
 }
 

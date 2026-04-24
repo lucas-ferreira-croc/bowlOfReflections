@@ -45,11 +45,15 @@ set(VK_SOURCE
     src/vk/bor_model.cpp
 )
 
+set(GAME_SOURCE
+    src/game/bor_game_object.hpp
+)
 
 add_executable(bowl_of_reflections
     ${MAIN_SOURCE}
     ${APPS_SOURCE}
     ${VK_SOURCE}
+    ${GAME_SOURCE}
     ${WINDOW_SOURCE}
 )
 

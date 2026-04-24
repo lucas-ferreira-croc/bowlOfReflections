@@ -3,22 +3,23 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include <stdexcept>
 #include <array>
-#include <iostream>
 
 namespace bor
 {
     struct SimplePushConstantData
     {
+        glm::mat2 transform{1.0f};
         glm::vec2 offset;
         alignas(16) glm::vec3 color;
     };
 
     FirstApp::FirstApp()
     {
-        loadModels();
+        loadGameObjects();
         createPipelineLayout();
         recreateSwapChain();
         createCommandBuffers();
@@ -29,7 +30,7 @@ namespace bor
         vkDestroyPipelineLayout(borDevice.device(), pipelineLayout, nullptr);
     }
 
-    void FirstApp::loadModels()
+    void FirstApp::loadGameObjects()
     {
         bool useSierpinski = false;
 
@@ -68,7 +69,16 @@ namespace bor
                 {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
             };
         }
-        borModel = std::make_unique<BoRModel>(borDevice, vertices);
+        auto borModel = std::make_shared<BoRModel>(borDevice, vertices);
+
+        auto triangle = BoRGameObject::createGameObject();
+        triangle.model = borModel;
+        triangle.color = {.4, 0.0, .7f };
+        triangle.transform2D.translation.x = .2f;
+        triangle.transform2D.scale = {2.0f, 0.5f};
+        triangle.transform2D.rotation = 0.25f * glm::two_pi<float>();
+
+        gameObjects.push_back(std::move(triangle));
     }
 
     void FirstApp::run()
@@ -160,14 +170,10 @@ namespace bor
             std::runtime_error("failed to allocate command buffers");
         }
 
-        std::cout << " commandBuffers.size(): " <<  commandBuffers.size() << '\n';
     }
 
     void FirstApp::recordCommandBuffer(int imageIndex)
     {
-        static int frame = 0;
-        frame = (frame + 1) % 100;
-
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -185,8 +191,7 @@ namespace bor
         renderPassInfo.renderArea.extent = borSwapChain->getSwapChainExtent();
 
         std::array<VkClearValue, 2> clearValues{};
-        //clearValues[0].color = {0.4f, 0.6f, 0.9f, 1.0f };
-        clearValues[0].color = {0.01f, 0.01f, 0.01f, 1.0f };
+        clearValues[0].color = {0.4f, 0.6f, 0.9f, 1.0f };
         clearValues[1].depthStencil = {1.0f, 0};
         renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
         renderPassInfo.pClearValues = clearValues.data();
@@ -204,27 +209,7 @@ namespace bor
         vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
         vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
-        borPipeline->bind(commandBuffers[imageIndex]);
-        borModel->bind(commandBuffers[imageIndex]);
-        for(int j = 0; j < 4; ++j)
-        {
-            SimplePushConstantData push{};
-            push.offset = {-0.5f + frame * 0.02f, -0.4f * j * 0.25f};
-            push.color = {0.0f, 0.0f, 0.2f + 0.2f * j};
-
-            vkCmdPushConstants(
-                commandBuffers[imageIndex],
-                pipelineLayout,
-                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                0,
-                sizeof(SimplePushConstantData),
-                &push
-            );
-
-
-            borModel->draw(commandBuffers[imageIndex]);
-        }
-
+        renderGameObjects(commandBuffers[imageIndex]);
 
         vkCmdEndRenderPass(commandBuffers[imageIndex]);
         if(vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS)
@@ -232,6 +217,33 @@ namespace bor
             throw::std::runtime_error("failed to record command buffer");
         }
     }
+
+    void FirstApp::renderGameObjects(VkCommandBuffer commandBuffer)
+    {
+        borPipeline->bind(commandBuffer);
+        for(auto& obj : gameObjects)
+        {
+            obj.transform2D.rotation = glm::mod(obj.transform2D.rotation + 0.01f, glm::tau<float>());
+
+            SimplePushConstantData push{};
+            push.offset = obj.transform2D.translation;
+            push.color = obj.color;
+            push.transform = obj.transform2D.mat2();
+
+            vkCmdPushConstants(
+                commandBuffer,
+                pipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                sizeof(SimplePushConstantData),
+                &push
+            );
+
+            obj.model->bind(commandBuffer);
+            obj.model->draw(commandBuffer);
+        }
+    }
+
 
     void FirstApp::freeCommandBuffers()
     {
