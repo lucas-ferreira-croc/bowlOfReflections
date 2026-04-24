@@ -35,7 +35,7 @@ class BoRDevice {
 
   // Not copyable or movable
   BoRDevice(const BoRDevice &) = delete;
-  void operator=(const BoRDevice &) = delete;
+  BoRDevice operator=(const BoRDevice &) = delete;
   BoRDevice(BoRDevice &&) = delete;
   BoRDevice &operator=(BoRDevice &&) = delete;
 

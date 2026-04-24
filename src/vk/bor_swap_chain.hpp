@@ -5,6 +5,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,10 +16,11 @@ class BoRSwapChain {
   static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
   BoRSwapChain(BoRDevice &deviceRef, VkExtent2D windowExtent);
+  BoRSwapChain(BoRDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<BoRSwapChain> previous);
   ~BoRSwapChain();
 
   BoRSwapChain(const BoRSwapChain &) = delete;
-  void operator=(const BoRSwapChain &) = delete;
+  BoRSwapChain operator=(const BoRSwapChain &) = delete;
 
   VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
   VkRenderPass getRenderPass() { return renderPass; }
@@ -38,6 +40,7 @@ class BoRSwapChain {
   VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
  private:
+  void init();
   void createSwapChain();
   void createImageViews();
   void createDepthResources();
@@ -68,6 +71,7 @@ class BoRSwapChain {
   VkExtent2D windowExtent;
 
   VkSwapchainKHR swapChain;
+  std::shared_ptr<BoRSwapChain> oldSwapChain;
 
   std::vector<VkSemaphore> imageAvailableSemaphores;
   std::vector<VkSemaphore> renderFinishedSemaphores;

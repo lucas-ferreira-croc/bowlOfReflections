@@ -12,6 +12,17 @@ namespace bor {
 
 BoRSwapChain::BoRSwapChain(BoRDevice &deviceRef, VkExtent2D extent)
     : device{deviceRef}, windowExtent{extent} {
+      init();
+}
+
+BoRSwapChain::BoRSwapChain(BoRDevice &deviceRef, VkExtent2D extent, std::shared_ptr<BoRSwapChain> previous)
+    : device{deviceRef}, windowExtent{extent}, oldSwapChain{previous} {
+      init();
+      oldSwapChain = nullptr;
+}
+
+void BoRSwapChain::init()
+{
   createSwapChain();
   createImageViews();
   createRenderPass();
@@ -161,7 +172,7 @@ void BoRSwapChain::createSwapChain() {
   createInfo.presentMode = presentMode;
   createInfo.clipped = VK_TRUE;
 
-  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
   if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
     throw std::runtime_error("failed to create swap chain!");

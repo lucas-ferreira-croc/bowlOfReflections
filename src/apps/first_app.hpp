@@ -32,11 +32,14 @@ namespace bor
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
+        void freeCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffer(int imageIndex);
 
         BoRWindow borWindow{WIDTH, HEIGHT, "Bowl of Reflections"};
         BoRDevice borDevice{borWindow};
-        BoRSwapChain borSwapChain{borDevice, borWindow.getExtent()};
+        std::unique_ptr<BoRSwapChain> borSwapChain;
         std::unique_ptr<BoRPipeline> borPipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
