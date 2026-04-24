@@ -21,7 +21,7 @@ namespace bor
 
     void FirstApp::loadModels()
     {
-        bool useSierpinski = true;
+        bool useSierpinski = false;
 
         std::vector<BoRModel::Vertex> vertices;
 
@@ -30,9 +30,9 @@ namespace bor
         {
             if (depth <= 0)
             {
-                vertices.push_back({top});
-                vertices.push_back({right});
-                vertices.push_back({left});
+                vertices.push_back({top, {1.0f, 0.0f, 0.0f}});
+                vertices.push_back({right, {0.0f, 1.0f, 0.0f}});
+                vertices.push_back({left, {0.0f, 0.0f, 1.0f}});
             }
             else
             {
@@ -53,9 +53,9 @@ namespace bor
         else 
         {
             vertices = {
-                {{0.0f, -0.5f}},
-                {{0.5f,  0.5f}},
-                {{-0.5f, 0.5f}},
+                {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                {{0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
+                {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
             };
         }
         borModel = std::make_unique<BoRModel>(borDevice, vertices);
