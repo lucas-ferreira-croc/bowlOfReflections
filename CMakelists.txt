@@ -41,6 +41,8 @@ set(VK_SOURCE
     src/vk/bor_device.cpp
     src/vk/bor_swap_chain.hpp
     src/vk/bor_swap_chain.cpp
+    src/vk/bor_model.hpp
+    src/vk/bor_model.cpp
 )
 
 

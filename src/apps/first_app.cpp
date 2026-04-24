@@ -8,6 +8,7 @@ namespace bor
 {
     FirstApp::FirstApp()
     {
+        loadModels();
         createPipelineLayout();
         createPipeline();
         createCommandBuffers();
@@ -18,6 +19,47 @@ namespace bor
         vkDestroyPipelineLayout(borDevice.device(), pipelineLayout, nullptr);
     }
 
+    void FirstApp::loadModels()
+    {
+        bool useSierpinski = true;
+
+        std::vector<BoRModel::Vertex> vertices;
+
+        std::function<void(int, glm::vec2, glm::vec2, glm::vec2)> sierpinski;
+        sierpinski = [&](int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top)
+        {
+            if (depth <= 0)
+            {
+                vertices.push_back({top});
+                vertices.push_back({right});
+                vertices.push_back({left});
+            }
+            else
+            {
+                auto leftTop = 0.5f * (left + top);
+                auto rightTop = 0.5f * (right + top);
+                auto leftRight = 0.5f * (left + right);
+
+                sierpinski(depth - 1, left, leftRight, leftTop);
+                sierpinski(depth - 1, leftRight, right, rightTop);
+                sierpinski(depth - 1, leftTop, rightTop, top);
+            }
+        };
+        
+        if(useSierpinski)
+        {
+            sierpinski(1, {-0.5f, 0.5f}, {0.5f, 0.5f}, {0.0f, -0.5f});
+        }
+        else 
+        {
+            vertices = {
+                {{0.0f, -0.5f}},
+                {{0.5f,  0.5f}},
+                {{-0.5f, 0.5f}},
+            };
+        }
+        borModel = std::make_unique<BoRModel>(borDevice, vertices);
+    }
 
     void FirstApp::run()
     {
@@ -98,7 +140,9 @@ namespace bor
 
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
             borPipeline->bind(commandBuffers[i]);
-            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            
+            borModel->bind(commandBuffers[i]);
+            borModel->draw(commandBuffers[i]);
 
             vkCmdEndRenderPass(commandBuffers[i]);
             if(vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)

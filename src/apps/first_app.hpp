@@ -5,6 +5,7 @@
 #include "vk/bor_pipeline.hpp"
 #include "vk/bor_device.hpp"
 #include "vk/bor_swap_chain.hpp"
+#include "vk/bor_model.hpp"
 
 #include <memory>
 #include <vector>
@@ -26,6 +27,8 @@ namespace bor
         void run();
 
     private:
+        void loadModels();
+
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -37,6 +40,8 @@ namespace bor
         std::unique_ptr<BoRPipeline> borPipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
+
+        std::unique_ptr<BoRModel> borModel;
     };
 }
 
