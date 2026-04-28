@@ -2,9 +2,10 @@
 #define FIRST_APP_HPP
 
 #include "window/bor_window.hpp"
-#include "vk/bor_pipeline.hpp"
 #include "vk/bor_device.hpp"
-#include "vk/bor_swap_chain.hpp"
+#include "vk/bor_renderer.hpp"
+
+#include "systems/simple_render_system.hpp"
 
 #include "game/bor_game_object.hpp"
 
@@ -30,23 +31,12 @@ namespace bor
     private:
         void loadGameObjects();
 
-        void createPipelineLayout();
-        void createPipeline();
-        void createCommandBuffers();
-        void freeCommandBuffers();
-        void drawFrame();
-        void recreateSwapChain();
-        void recordCommandBuffer(int imageIndex);
-        void renderGameObjects(VkCommandBuffer commandBuffer);
-
         BoRWindow borWindow{WIDTH, HEIGHT, "Bowl of Reflections"};
         BoRDevice borDevice{borWindow};
-        std::unique_ptr<BoRSwapChain> borSwapChain;
-        std::unique_ptr<BoRPipeline> borPipeline;
-        VkPipelineLayout pipelineLayout;
-        std::vector<VkCommandBuffer> commandBuffers;
+        BoRRenderer borRenderer{borWindow, borDevice};
 
         std::vector<BoRGameObject> gameObjects;
+
     };
 }
 

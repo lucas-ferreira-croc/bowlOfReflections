@@ -43,10 +43,17 @@ set(VK_SOURCE
     src/vk/bor_swap_chain.cpp
     src/vk/bor_model.hpp
     src/vk/bor_model.cpp
+    src/vk/bor_renderer.hpp
+    src/vk/bor_renderer.cpp
 )
 
 set(GAME_SOURCE
     src/game/bor_game_object.hpp
+)
+
+set(SYSTEMS_SOURCE
+    src/systems/simple_render_system.hpp
+    src/systems/simple_render_system.cpp
 )
 
 add_executable(bowl_of_reflections
@@ -54,6 +61,7 @@ add_executable(bowl_of_reflections
     ${APPS_SOURCE}
     ${VK_SOURCE}
     ${GAME_SOURCE}
+    ${SYSTEMS_SOURCE}
     ${WINDOW_SOURCE}
 )
 
