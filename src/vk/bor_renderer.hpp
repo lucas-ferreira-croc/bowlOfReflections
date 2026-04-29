@@ -25,6 +25,8 @@ namespace bor
             return borSwapChain->getRenderPass();
         }
 
+        float getAspectRatio() const { return borSwapChain->extentAspectRatio(); }
+
         bool isFrameInProgress() const { return isFrameStarted; };
         VkCommandBuffer getCurrentCommandBuffer() const {
             assert(isFrameStarted && "cannot get command buffer when frame not in progress");

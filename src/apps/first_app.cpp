@@ -1,5 +1,7 @@
 #include "first_app.hpp"
 
+#include "game/bor_camera.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -88,7 +90,7 @@ namespace bor
 
         auto cube = BoRGameObject::createGameObject();
         cube.model = cubeModel;
-        cube.transform.translation = {0.0f, 0.0f, 0.5f};
+        cube.transform.translation = {0.0f, 0.0f, 2.5f};
         cube.transform.scale = {0.5f, 0.5f, 0.5f};
         gameObjects.push_back(std::move(cube));
     }
@@ -96,15 +98,21 @@ namespace bor
     void FirstApp::run()
     {
         BoRSimpleRenderSystem simpleRenderSystem{borDevice, borRenderer.getSwapChainRenderPass()};
-
+        BoRCamera camera{};
+        
+        
         while (!borWindow.shouldClose())
         {
             glfwPollEvents();
-            
+
+            float aspect = borRenderer.getAspectRatio();
+            // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
+
             if(auto commandBuffer = borRenderer.beginFrame())
             {
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
                 borRenderer.endSwapChainRenderPass(commandBuffer);
                 borRenderer.endFrame();
             }

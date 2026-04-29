@@ -29,7 +29,7 @@ namespace bor
         vkDestroyPipelineLayout(borDevice.device(), pipelineLayout, nullptr);
     }
 
-    void BoRSimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<BoRGameObject>& gameObjects)
+    void BoRSimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<BoRGameObject>& gameObjects, const BoRCamera& camera)
     {
         borPipeline->bind(commandBuffer);
         for(auto& obj : gameObjects)
@@ -39,7 +39,7 @@ namespace bor
 
             SimplePushConstantData push{};
             push.color = obj.color;
-            push.transform = obj.transform.mat4();
+            push.transform = camera.getProjection() * obj.transform.mat4();
 
             vkCmdPushConstants(
                 commandBuffer,

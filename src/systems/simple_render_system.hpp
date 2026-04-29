@@ -1,6 +1,7 @@
 #ifndef BOR_SIMPLE_RENDER_SYSTEM_HPP
 #define BOR_SIMPLE_RENDER_SYSTEM_HPP
 
+#include "game/bor_camera.hpp"
 #include "vk/bor_pipeline.hpp"
 #include "vk/bor_device.hpp"
 
@@ -21,7 +22,7 @@ namespace bor
         BoRSimpleRenderSystem(const BoRSimpleRenderSystem&) = delete;
         BoRSimpleRenderSystem &operator=(const BoRSimpleRenderSystem&) = delete;
 
-        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<BoRGameObject>& gameObjects);
+        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<BoRGameObject>& gameObjects, const BoRCamera& camera);
     private:
         void createPipelineLayout();
         void createPipeline(VkRenderPass renderPass);
