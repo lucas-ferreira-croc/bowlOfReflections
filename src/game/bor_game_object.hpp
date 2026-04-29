@@ -19,6 +19,7 @@ namespace bor
         // model matrix = translate * Ry * Rx * Rz * scale
         // rotation convetion used tait-bryan with axis order Y(1), X(2), Z(3)
         // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
+        
         glm::mat4 mat4()
         {
             const float c3 = glm::cos(rotation.z);
