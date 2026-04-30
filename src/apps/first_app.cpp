@@ -27,12 +27,12 @@ namespace bor
     {
         bool useSierpinski = false;
 
-        std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\smooth_vase.obj");
+        std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\teapot.obj");
 
         auto gameObject = BoRGameObject::createGameObject();
         gameObject.model = borModel;
-        gameObject.transform.translation = {0.0f, 0.0f, 2.5f};
-        gameObject.transform.scale = glm::vec3(3.0f);
+        gameObject.transform.translation = {0.0f, 0.5f, 2.5f};
+        gameObject.transform.scale = glm::vec3(1.0f);
         gameObjects.push_back(std::move(gameObject));
     }
 

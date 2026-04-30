@@ -49,6 +49,7 @@ set(VK_SOURCE
 
 set(GAME_SOURCE
     src/game/bor_game_object.hpp
+    src/game/bor_game_object.cpp
     src/game/bor_camera.hpp
     src/game/bor_camera.cpp
     src/game/keyboard_movement_controller.hpp
