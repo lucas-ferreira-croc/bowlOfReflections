@@ -60,6 +60,10 @@ set(SYSTEMS_SOURCE
     src/systems/simple_render_system.cpp
 )
 
+set(UTILS_SOURCE
+    src/utils/utils.hpp
+)
+
 add_executable(bowl_of_reflections
     ${MAIN_SOURCE}
     ${APPS_SOURCE}
@@ -74,6 +78,7 @@ target_include_directories(bowl_of_reflections PRIVATE
     C:/VulkanSDK/1.4.341.1/Include
     deps/glfw/include
     deps/glm
+    deps/tiniyobjectloader
 )
 
 target_link_libraries(bowl_of_reflections PRIVATE

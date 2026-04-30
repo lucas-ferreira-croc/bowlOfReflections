@@ -14,7 +14,8 @@
                 "${workspaceFolder}/**",
                 "C:/VulkanSDK/1.4.341.1/Include",
                 "deps/glfw/include",
-                "deps/glm"
+                "deps/glm",
+                "deps/tiniyobjectloader"
             ],
 
             "defines": [
