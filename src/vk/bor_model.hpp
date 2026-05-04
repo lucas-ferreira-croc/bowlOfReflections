@@ -2,6 +2,7 @@
 #define BOR_MODEL_HPP
 
 #include "vk/bor_device.hpp"
+#include "vk/bor_buffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -54,13 +55,13 @@ namespace bor
 
         BoRDevice& borDevice;
 
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
+        
+        std::unique_ptr<BoRBuffer> vertexBuffer;
         uint32_t vertexCount;
 
         bool hasIndexBuffer = false;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        
+        std::unique_ptr<BoRBuffer> indexBuffer;
         uint32_t indexCount;
     };
 }

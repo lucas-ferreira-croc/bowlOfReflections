@@ -3,6 +3,8 @@
 #include "game/bor_camera.hpp"
 #include "game/keyboard_movement_controller.hpp"
 
+#include "vk/bor_buffer.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -10,10 +12,17 @@
 
 #include <stdexcept>
 #include <array>
+#include <vector>
 #include <chrono>
 
 namespace bor
 {
+    struct GlobalUbo
+    {
+        glm::mat4 projectionView{1.0f};
+        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, -1.0f});
+    };
+
     FirstApp::FirstApp()
     {
         loadGameObjects();
@@ -38,6 +47,21 @@ namespace bor
 
     void FirstApp::run()
     {
+        std::vector<std::unique_ptr<BoRBuffer>> uboBuffers(BoRSwapChain::MAX_FRAMES_IN_FLIGHT);
+
+        for(int i = 0; i < uboBuffers.size(); ++i)
+        {
+            uboBuffers[i] = std::make_unique<BoRBuffer>(
+                borDevice,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            );
+
+            uboBuffers[i]->map();
+        }
+
         BoRSimpleRenderSystem simpleRenderSystem{borDevice, borRenderer.getSwapChainRenderPass()};
         BoRCamera camera{};
         camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
@@ -62,8 +86,17 @@ namespace bor
 
             if(auto commandBuffer = borRenderer.beginFrame())
             {
+                // update object in memories
+                int frameIndex = borRenderer.getFrameIndex();
+                GlobalUbo ubo{};
+                ubo.projectionView = camera.getProjection() * camera.getView();
+                uboBuffers[frameIndex]->writeToBuffer(&ubo, frameIndex);
+                uboBuffers[frameIndex]->flush();
+
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
+                // render
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
                 borRenderer.endSwapChainRenderPass(commandBuffer);
                 borRenderer.endFrame();
             }

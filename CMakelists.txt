@@ -45,6 +45,8 @@ set(VK_SOURCE
     src/vk/bor_model.cpp
     src/vk/bor_renderer.hpp
     src/vk/bor_renderer.cpp
+    src/vk/bor_buffer.hpp
+    src/vk/bor_buffer.cpp
 )
 
 set(GAME_SOURCE
@@ -54,6 +56,7 @@ set(GAME_SOURCE
     src/game/bor_camera.cpp
     src/game/keyboard_movement_controller.hpp
     src/game/keyboard_movement_controller.cpp
+    src/game/bor_frame_info.hpp
 )
 
 set(SYSTEMS_SOURCE

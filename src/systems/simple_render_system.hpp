@@ -6,6 +6,7 @@
 #include "vk/bor_device.hpp"
 
 #include "game/bor_game_object.hpp"
+#include "game/bor_frame_info.hpp"
 
 #include <memory>
 #include <vector>
@@ -22,7 +23,7 @@ namespace bor
         BoRSimpleRenderSystem(const BoRSimpleRenderSystem&) = delete;
         BoRSimpleRenderSystem &operator=(const BoRSimpleRenderSystem&) = delete;
 
-        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<BoRGameObject>& gameObjects, const BoRCamera& camera);
+        void renderGameObjects(FrameInfo frameInfo, std::vector<BoRGameObject>& gameObjects);
     private:
         void createPipelineLayout();
         void createPipeline(VkRenderPass renderPass);

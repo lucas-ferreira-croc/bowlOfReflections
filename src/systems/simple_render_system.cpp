@@ -29,10 +29,10 @@ namespace bor
         vkDestroyPipelineLayout(borDevice.device(), pipelineLayout, nullptr);
     }
 
-    void BoRSimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<BoRGameObject>& gameObjects, const BoRCamera& camera)
+    void BoRSimpleRenderSystem::renderGameObjects(FrameInfo frameInfo, std::vector<BoRGameObject>& gameObjects)
     {
-        borPipeline->bind(commandBuffer);
-        auto projectionView = camera.getProjection() * camera.getView();
+        borPipeline->bind(frameInfo.commandBuffer);
+        auto projectionView = frameInfo.camera.getProjection() *  frameInfo.camera.getView();
         for(auto& obj : gameObjects)
         {
             SimplePushConstantData push{};
@@ -41,7 +41,7 @@ namespace bor
             push.normalMatrix = obj.transform.normalMatrix();
 
             vkCmdPushConstants(
-                commandBuffer,
+                frameInfo.commandBuffer,
                 pipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
@@ -49,8 +49,8 @@ namespace bor
                 &push
             );
 
-            obj.model->bind(commandBuffer);
-            obj.model->draw(commandBuffer);
+            obj.model->bind(frameInfo.commandBuffer);
+            obj.model->draw(frameInfo.commandBuffer);
         }
     }
 
