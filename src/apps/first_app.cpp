@@ -20,7 +20,10 @@ namespace bor
     struct GlobalUbo
     {
         glm::mat4 projectionView{1.0f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3{10.f, -3.0f, -1.0f});
+
+        glm::vec4 ambientColor{1.0f, 1.0f, 1.0f, 0.02f}; // w is light intensity
+        glm::vec3 lightPosition{-1.0f};
+        alignas(16) glm::vec4 lightColor{1.0f}; // w is light intensity
     };
 
     FirstApp::FirstApp()
@@ -50,16 +53,23 @@ namespace bor
         std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\flat_vase.obj");
         auto flatVase = BoRGameObject::createGameObject();
         flatVase.model = borModel;
-        flatVase.transform.translation = {-.5f, .5f, 2.5f};
-        flatVase.transform.scale = {3.f, 1.5f, 3.f};
+        flatVase.transform.translation = {-0.5f, 0.5f, 0.0f};
+        flatVase.transform.scale = {3.0f, 1.5f, 3.0f};
         gameObjects.push_back(std::move(flatVase));
 
         borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\smooth_vase.obj");
         auto smoothVase = BoRGameObject::createGameObject();
         smoothVase.model = borModel;
-        smoothVase.transform.translation = {.5f, .5f, 2.5f};
-        smoothVase.transform.scale = {3.f, 1.5f, 3.f};
+        smoothVase.transform.translation = {0.5f, 0.5f, 0.0f};
+        smoothVase.transform.scale = {3.0f, 1.5f, 3.0f};
         gameObjects.push_back(std::move(smoothVase));
+
+        borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\quad.obj");
+        auto floor = BoRGameObject::createGameObject();
+        floor.model = borModel;
+        floor.transform.translation = {0.0f, 0.5f, 0.0f};
+        floor.transform.scale = {3.0f, 1.0f, 3.0f};
+        gameObjects.push_back(std::move(floor));
     }
 
     void FirstApp::run()
@@ -98,6 +108,7 @@ namespace bor
         camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
         
         auto viewerObject = BoRGameObject::createGameObject();
+        viewerObject.transform.translation.z = -2.5f;
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -113,7 +124,7 @@ namespace bor
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = borRenderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.0f);
 
             if(auto commandBuffer = borRenderer.beginFrame())
             {
