@@ -29,7 +29,7 @@ namespace bor
         vkDestroyPipelineLayout(borDevice.device(), pipelineLayout, nullptr);
     }
 
-    void BoRSimpleRenderSystem::renderGameObjects(FrameInfo frameInfo, std::vector<BoRGameObject>& gameObjects)
+    void BoRSimpleRenderSystem::renderGameObjects(FrameInfo frameInfo)
     {
         borPipeline->bind(frameInfo.commandBuffer);
 
@@ -44,8 +44,11 @@ namespace bor
             nullptr
         );
 
-        for(auto& obj : gameObjects)
+        for(auto& kv : frameInfo.gameObjects)
         {
+            auto& obj = kv.second;
+            if(obj.model == nullptr) continue;
+            
             SimplePushConstantData push{};
             push.modelMatrix = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();

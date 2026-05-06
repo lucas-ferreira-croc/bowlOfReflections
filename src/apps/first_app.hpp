@@ -36,7 +36,7 @@ namespace bor
         BoRRenderer borRenderer{borWindow, borDevice};
 
         std::unique_ptr<BoRDescriptorPool> globalPool{};
-        std::vector<BoRGameObject> gameObjects;
+        BoRGameObject::Map gameObjects;
 
     };
 }

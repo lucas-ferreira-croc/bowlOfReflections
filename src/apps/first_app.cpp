@@ -55,21 +55,21 @@ namespace bor
         flatVase.model = borModel;
         flatVase.transform.translation = {-0.5f, 0.5f, 0.0f};
         flatVase.transform.scale = {3.0f, 1.5f, 3.0f};
-        gameObjects.push_back(std::move(flatVase));
+        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
         borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\smooth_vase.obj");
         auto smoothVase = BoRGameObject::createGameObject();
         smoothVase.model = borModel;
         smoothVase.transform.translation = {0.5f, 0.5f, 0.0f};
         smoothVase.transform.scale = {3.0f, 1.5f, 3.0f};
-        gameObjects.push_back(std::move(smoothVase));
+        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\quad.obj");
         auto floor = BoRGameObject::createGameObject();
         floor.model = borModel;
         floor.transform.translation = {0.0f, 0.5f, 0.0f};
         floor.transform.scale = {3.0f, 1.0f, 3.0f};
-        gameObjects.push_back(std::move(floor));
+        gameObjects.emplace(floor.getId(), std::move(floor));
     }
 
     void FirstApp::run()
@@ -91,7 +91,7 @@ namespace bor
 
          auto globalSetLayout =
             BoRDescriptorSetLayout::Builder(borDevice)
-                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                 .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(BoRSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -135,10 +135,10 @@ namespace bor
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
                 // render
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
+                simpleRenderSystem.renderGameObjects(frameInfo);
                 borRenderer.endSwapChainRenderPass(commandBuffer);
                 borRenderer.endFrame();
             }
