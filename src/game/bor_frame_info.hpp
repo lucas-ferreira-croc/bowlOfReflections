@@ -13,6 +13,7 @@ namespace bor
         float frameTime;
         VkCommandBuffer commandBuffer;
         BoRCamera& camera;
+        VkDescriptorSet globalDescriptorSet;
     };
 }
 

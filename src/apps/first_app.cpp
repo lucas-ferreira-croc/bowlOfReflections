@@ -20,11 +20,15 @@ namespace bor
     struct GlobalUbo
     {
         glm::mat4 projectionView{1.0f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, -1.0f});
+        glm::vec3 lightDirection = glm::normalize(glm::vec3{10.f, -3.0f, -1.0f});
     };
 
     FirstApp::FirstApp()
     {
+        globalPool = BoRDescriptorPool::Builder(borDevice)
+          .setMaxSets(BoRSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, BoRSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .build();
         loadGameObjects();
     }
 
@@ -34,15 +38,28 @@ namespace bor
 
     void FirstApp::loadGameObjects()
     {
-        bool useSierpinski = false;
+        // std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\teapot.obj");
 
-        std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\teapot.obj");
+        // auto gameObject = BoRGameObject::createGameObject();
+        // gameObject.model = borModel;
+        // gameObject.transform.translation = {0.0f, 0.5f, 2.5f};
+        // gameObject.transform.scale = glm::vec3(1.0f);
+        // gameObjects.push_back(std::move(gameObject));
 
-        auto gameObject = BoRGameObject::createGameObject();
-        gameObject.model = borModel;
-        gameObject.transform.translation = {0.0f, 0.5f, 2.5f};
-        gameObject.transform.scale = glm::vec3(1.0f);
-        gameObjects.push_back(std::move(gameObject));
+
+        std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\flat_vase.obj");
+        auto flatVase = BoRGameObject::createGameObject();
+        flatVase.model = borModel;
+        flatVase.transform.translation = {-.5f, .5f, 2.5f};
+        flatVase.transform.scale = {3.f, 1.5f, 3.f};
+        gameObjects.push_back(std::move(flatVase));
+
+        borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\smooth_vase.obj");
+        auto smoothVase = BoRGameObject::createGameObject();
+        smoothVase.model = borModel;
+        smoothVase.transform.translation = {.5f, .5f, 2.5f};
+        smoothVase.transform.scale = {3.f, 1.5f, 3.f};
+        gameObjects.push_back(std::move(smoothVase));
     }
 
     void FirstApp::run()
@@ -62,7 +79,21 @@ namespace bor
             uboBuffers[i]->map();
         }
 
-        BoRSimpleRenderSystem simpleRenderSystem{borDevice, borRenderer.getSwapChainRenderPass()};
+         auto globalSetLayout =
+            BoRDescriptorSetLayout::Builder(borDevice)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets(BoRSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            BoRDescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
+
+        BoRSimpleRenderSystem simpleRenderSystem{borDevice, borRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         BoRCamera camera{};
         camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
         
@@ -90,10 +121,10 @@ namespace bor
                 int frameIndex = borRenderer.getFrameIndex();
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjection() * camera.getView();
-                uboBuffers[frameIndex]->writeToBuffer(&ubo, frameIndex);
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]};
                 // render
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);

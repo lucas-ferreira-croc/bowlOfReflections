@@ -17,7 +17,7 @@ namespace bor
     {
     public:
         BoRSimpleRenderSystem() = default;
-        BoRSimpleRenderSystem(BoRDevice& device, VkRenderPass renderPass);
+        BoRSimpleRenderSystem(BoRDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
         ~BoRSimpleRenderSystem();
 
         BoRSimpleRenderSystem(const BoRSimpleRenderSystem&) = delete;
@@ -25,7 +25,7 @@ namespace bor
 
         void renderGameObjects(FrameInfo frameInfo, std::vector<BoRGameObject>& gameObjects);
     private:
-        void createPipelineLayout();
+        void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);
 
         BoRDevice& borDevice;

@@ -47,6 +47,8 @@ set(VK_SOURCE
     src/vk/bor_renderer.cpp
     src/vk/bor_buffer.hpp
     src/vk/bor_buffer.cpp
+    src/vk/bor_descriptors.hpp
+    src/vk/bor_descriptors.cpp
 )
 
 set(GAME_SOURCE
