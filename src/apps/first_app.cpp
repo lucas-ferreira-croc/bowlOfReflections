@@ -20,16 +20,6 @@
 
 namespace bor
 {
-    struct GlobalUbo
-    {
-        glm::mat4 projection{1.0f};
-        glm::mat4 view{1.0f};
-
-        glm::vec4 ambientColor{1.0f, 1.0f, 1.0f, 0.02f}; // w is light intensity
-        glm::vec3 lightPosition{-1.0f};
-        alignas(16) glm::vec4 lightColor{1.0f, 0.0f, 1.0f, 0.3f}; // w is light intensity
-    };
-
     FirstApp::FirstApp()
     {
         globalPool = BoRDescriptorPool::Builder(borDevice)
@@ -45,15 +35,6 @@ namespace bor
 
     void FirstApp::loadGameObjects()
     {
-        // std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\teapot.obj");
-
-        // auto gameObject = BoRGameObject::createGameObject();
-        // gameObject.model = borModel;
-        // gameObject.transform.translation = {0.0f, 0.5f, 2.5f};
-        // gameObject.transform.scale = glm::vec3(1.0f);
-        // gameObjects.push_back(std::move(gameObject));
-
-
         std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\flat_vase.obj");
         auto flatVase = BoRGameObject::createGameObject();
         flatVase.model = borModel;
@@ -74,6 +55,30 @@ namespace bor
         floor.transform.translation = {0.0f, 0.5f, 0.0f};
         floor.transform.scale = {3.0f, 1.0f, 3.0f};
         gameObjects.emplace(floor.getId(), std::move(floor));
+
+        
+        std::vector<glm::vec3> lightColors{
+            {1.f, .1f, .1f},
+            {.1f, .1f, 1.f},
+            {.1f, 1.f, .1f},
+            {1.f, 1.f, .1f},
+            {.1f, 1.f, 1.f},
+            {1.f, 1.f, 1.f}  
+        };
+        
+        for(int i = 0; i < lightColors.size(); i++)
+        {
+            auto pointLight = BoRGameObject::makePointLight(0.2f);
+            pointLight.color = lightColors[i];
+            auto rotateLight = glm::rotate(
+                glm::mat4(1.0f),
+                (i * glm::tau<float>()) / lightColors.size(),
+                {0.0f, -1.0f, 0.0f}
+            );
+            pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));
+            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+        }
+
     }
 
     void FirstApp::run()
@@ -135,13 +140,15 @@ namespace bor
             {
                 // update object in memories
                 int frameIndex = borRenderer.getFrameIndex();
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
+
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjection();
                 ubo.view = camera.getView();
+                pointLightSystem.update(frameInfo, ubo);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
                 // render
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo);

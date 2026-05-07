@@ -25,6 +25,11 @@ namespace bor
         glm::mat3 normalMatrix();
     };
 
+    struct PointLightComponent
+    {
+        float lightIntensity = 1.0f;
+    };
+
     class BoRGameObject
     {
     public:
@@ -36,6 +41,8 @@ namespace bor
             static id_t currentId = 0;
             return BoRGameObject{currentId++};
         }
+        
+        static BoRGameObject makePointLight(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.0f));
 
         BoRGameObject(const BoRGameObject&) = delete;
         BoRGameObject &operator=(const BoRGameObject&) = delete;
@@ -44,9 +51,13 @@ namespace bor
 
         id_t getId() { return id; }
 
-        std::shared_ptr<BoRModel> model{};
         glm::vec3 color{};
         TransformComponent transform{};
+        
+        //optional components;
+        std::shared_ptr<BoRModel> model{};
+        std::unique_ptr<PointLightComponent> pointLight = nullptr;
+
     private:
         BoRGameObject(id_t objId) : id{objId} {}
 

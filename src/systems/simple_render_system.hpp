@@ -23,7 +23,7 @@ namespace bor
         BoRSimpleRenderSystem(const BoRSimpleRenderSystem&) = delete;
         BoRSimpleRenderSystem &operator=(const BoRSimpleRenderSystem&) = delete;
 
-        void renderGameObjects(FrameInfo frameInfo);
+        void renderGameObjects(FrameInfo& frameInfo);
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);

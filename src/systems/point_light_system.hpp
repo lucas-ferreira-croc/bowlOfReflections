@@ -23,7 +23,8 @@ namespace bor
         BoRPointLightSystem(const BoRPointLightSystem&) = delete;
         BoRPointLightSystem &operator=(const BoRPointLightSystem&) = delete;
 
-        void render(FrameInfo frameInfo);
+        void update(FrameInfo& frameInfo, GlobalUbo& ubo);
+        void render(FrameInfo& frameInfo);
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);

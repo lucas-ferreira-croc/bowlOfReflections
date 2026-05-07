@@ -29,7 +29,7 @@ namespace bor
         vkDestroyPipelineLayout(borDevice.device(), pipelineLayout, nullptr);
     }
 
-    void BoRSimpleRenderSystem::renderGameObjects(FrameInfo frameInfo)
+    void BoRSimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo)
     {
         borPipeline->bind(frameInfo.commandBuffer);
 
