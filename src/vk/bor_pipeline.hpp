@@ -14,6 +14,8 @@ namespace bor
         PipelineConfigInfo(const PipelineConfigInfo&) = delete;
         PipelineConfigInfo &operator=(const PipelineConfigInfo&) = delete;
 
+        std::vector<VkVertexInputBindingDescription> bindingDescription;
+        std::vector<VkVertexInputAttributeDescription> attributeDescription;
         VkPipelineViewportStateCreateInfo viewportInfo;
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo rasterizationInfo;

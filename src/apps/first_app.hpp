@@ -5,7 +5,6 @@
 #include "vk/bor_device.hpp"
 #include "vk/bor_renderer.hpp"
 #include "vk/bor_descriptors.hpp"
-#include "systems/simple_render_system.hpp"
 
 #include "game/bor_game_object.hpp"
 

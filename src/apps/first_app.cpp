@@ -3,6 +3,9 @@
 #include "game/bor_camera.hpp"
 #include "game/keyboard_movement_controller.hpp"
 
+#include "systems/simple_render_system.hpp"
+#include "systems/point_light_system.hpp"
+
 #include "vk/bor_buffer.hpp"
 
 #define GLM_FORCE_RADIANS
@@ -19,11 +22,12 @@ namespace bor
 {
     struct GlobalUbo
     {
-        glm::mat4 projectionView{1.0f};
+        glm::mat4 projection{1.0f};
+        glm::mat4 view{1.0f};
 
         glm::vec4 ambientColor{1.0f, 1.0f, 1.0f, 0.02f}; // w is light intensity
         glm::vec3 lightPosition{-1.0f};
-        alignas(16) glm::vec4 lightColor{1.0f}; // w is light intensity
+        alignas(16) glm::vec4 lightColor{1.0f, 0.0f, 1.0f, 0.3f}; // w is light intensity
     };
 
     FirstApp::FirstApp()
@@ -104,6 +108,7 @@ namespace bor
 
 
         BoRSimpleRenderSystem simpleRenderSystem{borDevice, borRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+        BoRPointLightSystem pointLightSystem{borDevice, borRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         BoRCamera camera{};
         camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
         
@@ -131,7 +136,8 @@ namespace bor
                 // update object in memories
                 int frameIndex = borRenderer.getFrameIndex();
                 GlobalUbo ubo{};
-                ubo.projectionView = camera.getProjection() * camera.getView();
+                ubo.projection = camera.getProjection();
+                ubo.view = camera.getView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -139,6 +145,7 @@ namespace bor
                 // render
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo);
+                pointLightSystem.render(frameInfo);
                 borRenderer.endSwapChainRenderPass(commandBuffer);
                 borRenderer.endFrame();
             }
