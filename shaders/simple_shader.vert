@@ -19,11 +19,13 @@ layout(set = 0, binding = 0) uniform GlobalUbo
 {
   mat4 projection;
   mat4 view;
+  mat4 inverseView;
 
   vec4 ambientLightColor; // w is intensity
   PointLight pointLights[10];
   int numLights;
 } ubo;
+
 layout(push_constant) uniform Push {
   mat4 modelMatrix;
   mat4 normalMatrix;
