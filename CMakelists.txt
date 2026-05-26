@@ -66,10 +66,22 @@ set(SYSTEMS_SOURCE
     src/systems/simple_render_system.cpp
     src/systems/point_light_system.hpp
     src/systems/point_light_system.cpp
+    src/systems/ui_system.hpp
+    src/systems/ui_system.cpp
 )
 
 set(UTILS_SOURCE
     src/utils/utils.hpp
+)
+
+set(IMGUI_SOURCE
+    deps/imgui/imgui.cpp
+    deps/imgui/imgui_draw.cpp
+    deps/imgui/imgui_tables.cpp
+    deps/imgui/imgui_widgets.cpp
+    deps/imgui/imgui_demo.cpp
+    deps/imgui/backends/imgui_impl_glfw.cpp
+    deps/imgui/backends/imgui_impl_vulkan.cpp
 )
 
 add_executable(bowl_of_reflections
@@ -79,6 +91,7 @@ add_executable(bowl_of_reflections
     ${GAME_SOURCE}
     ${SYSTEMS_SOURCE}
     ${WINDOW_SOURCE}
+    ${IMGUI_SOURCE}
 )
 
 target_include_directories(bowl_of_reflections PRIVATE
@@ -87,6 +100,8 @@ target_include_directories(bowl_of_reflections PRIVATE
     deps/glfw/include
     deps/glm
     deps/tiniyobjectloader
+    deps/imgui
+    deps/imgui/backends
 )
 
 target_link_libraries(bowl_of_reflections PRIVATE

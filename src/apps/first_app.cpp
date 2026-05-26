@@ -5,6 +5,7 @@
 
 #include "systems/simple_render_system.hpp"
 #include "systems/point_light_system.hpp"
+#include "systems/ui_system.hpp"
 
 #include "vk/bor_buffer.hpp"
 
@@ -17,6 +18,7 @@
 #include <array>
 #include <vector>
 #include <chrono>
+
 
 namespace bor
 {
@@ -114,6 +116,7 @@ namespace bor
 
         BoRSimpleRenderSystem simpleRenderSystem{borDevice, borRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         BoRPointLightSystem pointLightSystem{borDevice, borRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+        BoRUInterfaceSystem uiSystem{borWindow, borDevice, borRenderer.getSwapChainRenderPass()};
         BoRCamera camera{};
         camera.setViewTarget(glm::vec3(-1.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 2.5f));
         
@@ -122,10 +125,12 @@ namespace bor
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
+        
+
+        bool showDemoWindow = true;
         while (!borWindow.shouldClose())
         {
             glfwPollEvents();
-            
             auto newTime = std::chrono::high_resolution_clock::now();
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
@@ -138,6 +143,20 @@ namespace bor
 
             if(auto commandBuffer = borRenderer.beginFrame())
             {
+                uiSystem.newFrame();
+                ImGui::ShowDemoWindow(&showDemoWindow);
+
+                if(glfwGetKey(borWindow.getGLFWWindow(), GLFW_KEY_M) == GLFW_PRESS)
+                {
+                    std::shared_ptr<BoRModel> borModel = BoRModel::createModelFromFile(borDevice, "C:\\dev\\bowlOfReflections\\models\\flat_vase.obj");
+                    auto flatVase = BoRGameObject::createGameObject();
+                    flatVase.model = borModel;
+                    flatVase.transform.translation = {0.0f, 0.0f, 0.0f};
+                    flatVase.transform.scale = {3.0f, 3.5f, 3.0f};
+                    gameObjects.emplace(flatVase.getId(), std::move(flatVase));
+
+                }
+
                 // update object in memories
                 int frameIndex = borRenderer.getFrameIndex();
                 FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
@@ -154,6 +173,7 @@ namespace bor
                 borRenderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
+                uiSystem.render(commandBuffer);
                 borRenderer.endSwapChainRenderPass(commandBuffer);
                 borRenderer.endFrame();
             }

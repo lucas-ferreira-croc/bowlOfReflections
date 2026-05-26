@@ -81,8 +81,10 @@ namespace bor
         void freeDescriptors(std::vector<VkDescriptorSet> &descriptors) const;
         
         void resetPool();
-    
+            
+        VkDescriptorPool getDescriptorPool() { return descriptorPool; }
     private:
+
         BoRDevice &borDevice;
         VkDescriptorPool descriptorPool;
         
